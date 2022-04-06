@@ -1,10 +1,18 @@
-FROM golang:alpine AS build-env
-RUN mkdir /go/src/app && apk update && apk add git
-ADD main.go /go/src/app/
-WORKDIR /go/src/app
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o app .
+FROM golang:1.14-alpine
 
-FROM scratch
+LABEL maintainer="Bo-Yi Wu <appleboy.tw@gmail.com>"
+
+RUN apk add bash ca-certificates git gcc g++ libc-dev
 WORKDIR /app
-COPY --from=build-env /go/src/app/app .
-ENTRYPOINT [ "./app" ]
+# Force the go compiler to use modules
+ENV GO111MODULE=on
+# We want to populate the module cache based on the go.{mod,sum} files.
+COPY go.mod .
+COPY go.sum .
+COPY main.go .
+
+ENV GOOS=linux
+ENV GOARCH=amd64
+RUN go build -o /app -tags netgo -ldflags '-w -extldflags "-static"' .
+
+CMD ["/app"]
