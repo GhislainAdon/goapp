@@ -21,11 +21,11 @@ steps:
 
 - name: publish
   pull: always
-  image: plugins/docker:linux-amd64
+  image: plugins/docker
   settings:
     auto_tag: true
-    cache_from: appleboy/gin-docker-demo
-    daemon_off: false
+    #cache_from: appleboy/gin-docker-demo
+    #daemon_off: false
     dockerfile: Dockerfile
     password:
       from_secret: docker_password
