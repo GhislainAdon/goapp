@@ -1,21 +1,38 @@
+---
 kind: pipeline
-type : docker
-name: default
+name: linux-amd64
+
+platform:
+  os: linux
+  arch: amd64
+
 steps:
-- name: test
- image: golang:1.10-alpine
- commands:
-   - "go test"
-- name: build
- image: golang:1.10-alpine
- commands:
-   - "go build -o ./myapp"
+# - name: build-push
+#   pull: always
+#   image: golang:1.14
+#   commands:
+#   - go build -v -a -o docker-demo
+#   environment:
+#     CGO_ENABLED: 0
+#   when:
+#     event:
+#       exclude:
+#       - tag
+
 - name: publish
- image: plugins/docker
- settings:
-   repo: magalixcorp/k8scicd
-   tags: [ "${DRONE_COMMIT_SHA:0:7}","latest" ]
-   username:
-     from_secret: docker_username
-   password:
-     from_secret: docker_password
+  pull: always
+  image: plugins/docker:linux-amd64
+  settings:
+    auto_tag: true
+    cache_from: appleboy/gin-docker-demo
+    daemon_off: false
+    dockerfile: Dockerfile
+    password:
+      from_secret: docker_password
+    repo: adon1996/hive
+    username:
+      from_secret: docker_username
+  when:
+    event:
+      exclude:
+      - pull_request
