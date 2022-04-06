@@ -25,7 +25,7 @@ steps:
   settings:
     auto_tag: true
     #cache_from: appleboy/gin-docker-demo
-    #daemon_off: false
+    daemon_off: true
     dockerfile: Dockerfile
     password:
       from_secret: docker_password
